@@ -55,7 +55,7 @@ def list_transactions():
         return
     
     for i, item in enumerate(data, start=1):
-        print(f"{i}: ID {item.get('id', '------')} | {item['date']} | {item['type']} | {item['category']} | {item['amount']} | {item['description']}")
+        print(f"{i}: ID {item.get('id', '------')} | {item['date']} | {item['type_']} | {item['category']} | {item['amount']} | {item['description']}")
 
 
 # Функция add_transaction() получает список предыдущих транзакций в data
@@ -87,7 +87,7 @@ def add_transaction(amount, category, type_, description = ""):
 def delete_transaction(transaction_id):
     data = load_data()
     for i,item in enumerate(data):
-        if item.get("id") == transaction_id:
+        if item.get("id") == str(transaction_id):
             removed = data.pop(i)
             save_data(data)
             print(f"Удалена транзакция ID {transaction_id}: {removed["type_"]} - на сумму {removed["amount"]} от {removed["date"]}")
