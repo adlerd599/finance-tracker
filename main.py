@@ -1,4 +1,3 @@
-from transaction import list_transactions
+from transaction import list_transactions, add_transaction, delete_transaction, print_transaction, edit_transaction
 
-list_transactions()
-
+edit_transaction(477653)

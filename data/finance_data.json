@@ -1,10 +1,32 @@
 [
   {
     "amount": 1500,
-    "category": "еда",
+    "category": "salary",
+    "type_": "income",
+    "description": "edit test",
+    "date": "10-05-1998",
+    "id": "477653",
+    "subcategory": "first job",
+    "optional": false
+  },
+  {
+    "id": "926382",
+    "date": "2025-05-23",
+    "amount": 100,
+    "type_": "расходы",
+    "category": "транспорт",
+    "subcategory": "чехлы",
+    "description": "",
+    "optional": true
+  },
+  {
+    "id": "851962",
+    "date": "10-05-1998",
+    "amount": 100,
     "type_": "expense",
-    "description": "Поход в магазин",
-    "date": "2025-05-21",
-    "id": "477653"
+    "category": "car",
+    "subcategory": "fuel",
+    "description": "last time in the month",
+    "optional": true
   }
 ]
