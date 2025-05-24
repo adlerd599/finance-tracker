@@ -13,9 +13,9 @@
     "id": "926382",
     "date": "2025-05-23",
     "amount": 100,
-    "type_": "расходы",
-    "category": "транспорт",
-    "subcategory": "чехлы",
+    "type_": "expenses",
+    "category": "test1",
+    "subcategory": "1",
     "description": "",
     "optional": true
   },

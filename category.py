@@ -12,7 +12,7 @@ CATEGORY_PATH = os.path.join("data", "categories.json")
 # Функция load_categories() преобразует json файл в словарь и возвращает этот словарь
 def load_categories():
     if not os.path.exists(CATEGORY_PATH):
-        return []
+        return {}
     with open(CATEGORY_PATH, "r", encoding="utf-8") as file:
         return json.load(file)
     
@@ -31,10 +31,19 @@ def add_category(type_, category_name, subcategories=None):
     # Проверка на корректность типа транзакции
     if not validate_type(type_):
         return
+    type_ = type_.strip().lower()
+    
+    # category_name должна быть строкой
+    if not isinstance(category_name, str):
+        print()
+        print("Ошибка: название категории должно быть строкой!")
+        return
 
     # Проверка на пустой параметр
     if not validate_not_empty(category_name, "Название категории"):
         return
+    
+    category_name = category_name.strip()
 
     # Если тип транзакции еще не создан, то создаем его
     if type_ not in categories:
@@ -50,49 +59,76 @@ def add_category(type_, category_name, subcategories=None):
     if subcategories is None:
         subcategories = []
     else:
-        # Удаляем пробелы у каждой подкатегории
-        subcategories = [sub.strip() for sub in subcategories]
-
+        # Проверка, что subcategories - список
+        if not isinstance(subcategories, list):
+            print()
+            print("Ошибка: подкатегории должны быть переданы списком!")
+            return
+        
         # Проверяем, что нет пустых подкатегорий
+        cleaned_subcategories = []
         for sub in subcategories:
-            if not validate_not_empty(sub):
+            if not isinstance(sub, str):
+                print()
+                print("Ошибка: названия подкатегорий должны быть строками!")
                 return
             
+            sub = sub.strip()
+            if not validate_not_empty(sub):
+                return
+            cleaned_subcategories.append(sub)
+            
         # Проверяем на уникальность
-        if len(subcategories) != len(set(subcategories)):
+        if len(cleaned_subcategories) != len(set(cleaned_subcategories)):
             print("Названия подкатегорий не должны повторяться!")
             return
         
-    categories[type_][category_name] = subcategories
+    categories[type_][category_name] = cleaned_subcategories
     save_categories(categories)
 
     print()
     print(f"Категория {category_name} добавлена!")
-    if subcategories:
-        print(f"А также ее подкатегории: {','.join(subcategories)}")
+    if cleaned_subcategories:
+        print(f"А также ее подкатегории: {','.join(cleaned_subcategories)}")
 
 
 # Функция add_subcategory() добавляет подкатегорию в уже существующую категорию
 def add_subcategory(type_, category_name, new_subcategory):
     categories = load_categories()
-    new_subcategory = new_subcategory.strip()
 
     # Проверка на корректность типа транзакции
     if not validate_type(type_):
         return
-
-    # Проверка на пустой параметр
-    if not validate_not_empty(new_subcategory, "Название подкатегории"):
-        return
+    type_ = type_.strip().lower()
     
     # Если тип транзакции еще не создан, то создаем его
     if type_ not in categories:
         categories[type_] = {}
     
+    # category_name должна быть строкой
+    if not isinstance(category_name, str):
+        print()
+        print("Ошибка: название категории должно быть строкой!")
+        return
+    
+    category_name = category_name.strip()
+    
     # Проверка на существование категории
     if category_name not in categories[type_]:
         print()
         print(f"Ошибка: Категория {category_name} не найдена!")
+        return
+
+    # Проверка, что подкатегория передана строкой
+    if not isinstance(new_subcategory, str):
+        print()
+        print("Ошибка: подкатегория должна быть передана строкой!")
+        return
+    
+    new_subcategory = new_subcategory.strip()
+
+    # Проверка на пустой параметр
+    if not validate_not_empty(new_subcategory, "Название подкатегории"):
         return
     
     # Проверка на существование новой подкатегории
@@ -105,7 +141,7 @@ def add_subcategory(type_, category_name, new_subcategory):
     subcategories.append(new_subcategory)
     save_categories(categories)
     print()
-    print(f" Подкатегория {new_subcategory} добавлена в категорию {category_name}.")
+    print(f"Подкатегория {new_subcategory} добавлена в категорию {category_name}.")
 
 
 # Функция delete_category() удаляет категорию вместе со всеми подкатегориями
@@ -115,9 +151,23 @@ def delete_category(type_, category_name):
     
     if not validate_type(type_):
         return
-    
+    type_ = type_.strip().lower()
 
-    if category_name not in categories.get(type_, {}):
+    # Проверяем, что тип транзакций существует
+    if type_ not in categories:
+        print()
+        print("Ошибка: Тип транзакций не существует!")
+        return
+
+    # category_name должна быть строкой
+    if not isinstance(category_name, str):
+        print()
+        print("Ошибка: название категории должно быть строкой!")
+        return
+    
+    category_name = category_name.strip()
+
+    if category_name not in categories[type_]:
         print()
         print(f"Ошибка: Категория {category_name} не найдена!")
         return
@@ -139,7 +189,6 @@ def delete_category(type_, category_name):
     return
     
 
-
 # Функция delete_subcategory() удаляет одну подкатегорию из категории.
 def delete_subcategory(type_, category_name, subcategory_name):
     categories = load_categories()
@@ -147,6 +196,15 @@ def delete_subcategory(type_, category_name, subcategory_name):
 
     if not validate_type(type_):
         return
+    type_ = type_.strip().lower()
+
+    # category_name должна быть строкой
+    if not isinstance(category_name, str):
+        print()
+        print("Ошибка: название категории должно быть строкой!")
+        return
+    
+    category_name = category_name.strip()
 
     # Проверяем существует ли заданная категория
     if category_name not in categories.get(type_, {}):
@@ -154,6 +212,14 @@ def delete_subcategory(type_, category_name, subcategory_name):
         print(f"Ошибка: Категория {category_name} не найдена!")
         return
     
+    # subcategory_name должна быть строкой
+    if not isinstance(subcategory_name, str):
+        print()
+        print("Ошибка: название подкатегории должно быть строкой!")
+        return
+    
+    subcategory_name = subcategory_name.strip()
+
     # Проверяем существует ли подкатегория
     if subcategory_name not in categories[type_][category_name]:
         print()
@@ -162,7 +228,7 @@ def delete_subcategory(type_, category_name, subcategory_name):
     
     # Проверка наличия связанных транзакций
     for transaction in data:
-        if (transaction.get('type') == type_ and
+        if (transaction.get('type_') == type_ and
             transaction.get('category') == category_name and
             transaction.get('subcategory') == subcategory_name):
             print()
@@ -180,15 +246,12 @@ def delete_subcategory(type_, category_name, subcategory_name):
 # Функция rename_category() меняет имя категории.
 def rename_category(type_, old_name, new_name):
     categories = load_categories()
-    new_name = new_name.strip()
+    data = load_data()
 
     # Проверка на корректность типа транзакции
     if not validate_type(type_):
         return
-
-    # Проверка на пустой параметр
-    if not validate_not_empty(new_name, "Новое название категории"):
-        return
+    type_ = type_.strip().lower()
 
     # Проверяем существование
     if type_ not in categories:
@@ -196,10 +259,30 @@ def rename_category(type_, old_name, new_name):
         print(f"Ошибка: тип '{type_}' не найден.")
         return
 
+    # Проверяем старое имя категории
+    if not isinstance(old_name, str):
+        print()
+        print("Старое название категории должно быть строкой!")
+        return
+    
+    old_name = old_name.strip()
+    
     if old_name not in categories[type_]:
         print()
         print(f"Ошибка: Категория {old_name} не найдена!")
         return
+    
+    # Проверяем новое имя категории
+    if not isinstance(new_name, str):
+        print()
+        print("Новое название категории должно быть строкой!")
+        return
+
+    # Проверка на пустой параметр
+    if not validate_not_empty(new_name, "Новое название категории"):
+        return
+    
+    new_name = new_name.strip()
     
     if new_name in categories[type_]:
         print()
@@ -211,7 +294,6 @@ def rename_category(type_, old_name, new_name):
     save_categories(categories)
 
     # Обновляем все транзакции
-    data = load_data()
     for transaction in data:
         if transaction.get('type_') == type_ and transaction.get('category') == old_name:
             transaction['category'] = new_name
@@ -224,31 +306,56 @@ def rename_category(type_, old_name, new_name):
 # Функция rename_subcategory() изменяет имя подкатегории
 def rename_subcategory(type_, category_name, sub_old, sub_new):
     categories = load_categories()
-    sub_new = sub_new.strip()
+    data = load_data()
 
     # Проверка на корректность типа транзакции
     if not validate_type(type_):
+        return
+    type_ = type_.strip().lower()
+
+    # Проверяем существование
+    if type_ not in categories:
+        print()
+        print(f"Ошибка: тип '{type_}' не найден.")
+        return
+    
+    # Проверяем category_name 
+    if not isinstance(category_name, str):
+        print()
+        print("Ошибка: название категории должно быть строкой!")
+        return
+    
+    category_name = category_name.strip()
+
+    if category_name not in categories[type_]:
+        print()
+        print(f"Ошибка: Категория {category_name} не найдена!")
+        return
+
+    # Проверяем sub_old
+    if not isinstance(sub_old, str):
+        print()
+        print("Прежнее имя подкатегории должно быть строкой!")
+        return
+    
+    sub_old = sub_old.strip()
+
+    if sub_old not in categories[type_][category_name]:
+        print()
+        print(f"Ошибка: Подкатегория {sub_old} не найдена!")
+        return
+    
+    # Проверяем sub_new
+    if not isinstance(sub_new, str):
+        print()
+        print("Новое имя подкатегории должно быть строкой!")
         return
 
     # Проверка на пустой параметр
     if not validate_not_empty(sub_new, "Новое название подкатегории"):
         return
     
-    # Проверяем существование
-    if type_ not in categories:
-        print()
-        print(f"Ошибка: тип '{type_}' не найден.")
-        return
-
-    if category_name not in categories[type_]:
-        print()
-        print(f"Ошибка: Категория {category_name} не найдена!")
-        return
-    
-    if sub_old not in categories[type_][category_name]:
-        print()
-        print(f"Ошибка: Подкатегория {sub_old} не найдена!")
-        return
+    sub_new = sub_new.strip()
     
     # Проверка на существование новой подкатегории
     if sub_new in categories[type_][category_name]:
@@ -263,9 +370,10 @@ def rename_subcategory(type_, category_name, sub_old, sub_new):
     save_categories(categories)
 
     # Обновляем все транзакции
-    data = load_data()
     for transaction in data:
-        if transaction.get('type_') == type_ and transaction.get('category') == category_name and transaction.get('subcategory') == sub_old:
+        if (transaction.get('type_') == type_ 
+            and transaction.get('category') == category_name 
+            and transaction.get('subcategory') == sub_old):
             transaction['subcategory'] = sub_new
     save_data(data)
 
@@ -281,6 +389,7 @@ def move_transactions(type_, old_category, new_category, old_sub=None, new_sub=N
     # Проверка типа транзакции
     if not validate_type(type_):
         return
+    type_ = type_.strip().lower()
     
     # Проверка существования категорий
     if type_ not in categories:
@@ -288,25 +397,57 @@ def move_transactions(type_, old_category, new_category, old_sub=None, new_sub=N
         print(f"Ошибка: Тип транзакции {type_} не существует!")
         return
     
+    # Проверяем Old_category
+    if not isinstance(old_category, str):
+        print()
+        print("Ошибка: прежняя категория должна быть передана строкой!")
+        return
+    
+    old_category = old_category.strip()
+    
     if old_category not in categories[type_]:
         print()
         print(f"Ошибка: Категория {old_category} не существует!")
         return
+    
+    # Проверяем new_category
+    if not isinstance(new_category, str):
+        print()
+        print("Ошибка: новая категория должна быть передана строкой!")
+        return
+    
+    new_category = new_category.strip()
     
     if new_category not in categories[type_]:
         print()
         print(f"Ошибка: Категория {new_category} не существует!")
         return
     
-    if old_sub and old_sub not in categories[type_][old_category]:
-        print()
-        print(f"Подкатегория {old_sub} не существует")
-        return
+    if old_sub:
+        if not isinstance(old_sub, str):
+            print()
+            print("Ошибка: прежняя подкатегория должна быть передана строкой!")
+            return
+        
+        old_sub = old_sub.strip()
+
+        if old_sub not in categories[type_][old_category]:
+            print()
+            print(f"Подкатегория {old_sub} не существует")
+            return
     
-    if new_sub and new_sub not in categories[type_][new_category]:
-        print()
-        print(f"Подкатегория {new_sub} не существует")
-        return
+    if new_sub:
+        if not isinstance(new_sub, str):
+            print()
+            print("Ошибка: новая подкатегория должна быть передана строкой!")
+            return
+        
+        new_sub = new_sub.strip()
+
+        if new_sub not in categories[type_][new_category]:
+            print()
+            print(f"Подкатегория {new_sub} не существует")
+            return
 
     moved_count = 0
 
@@ -329,11 +470,16 @@ def move_transactions(type_, old_category, new_category, old_sub=None, new_sub=N
 
         moved_count += 1
 
-    save_data(data)
-    print()
-    print(f"Перемещено {moved_count} транзакций из категории '{old_category}'"
-      f"{f' / {old_sub}' if old_sub else ''} в категорию '{new_category}'"
-      f"{f' / {new_sub}' if new_sub else ''}")
+    if moved_count == 0:
+        print()
+        print("Транзакций для перевода не обнаружено!")
+        return
+    else:
+        save_data(data)
+        print()
+        print(f"Перемещено {moved_count} транзакций из категории '{old_category}'"
+            f"{f' / {old_sub}' if old_sub else ''} в категорию '{new_category}'"
+            f"{f' / {new_sub}' if new_sub else ''}")
 
 
 
