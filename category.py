@@ -57,7 +57,7 @@ def add_category(type_, category_name, subcategories=None):
     
     # Если подкатегории не переданы, то создаем пустой массив
     if subcategories is None:
-        subcategories = []
+        cleaned_subcategories = []
     else:
         # Проверка, что subcategories - список
         if not isinstance(subcategories, list):

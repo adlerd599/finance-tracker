@@ -51,3 +51,11 @@ def validate_type(type_):
         print("Ошибка: допустимые значения — 'income' или 'expenses'")
         return False
     return True
+
+# Проверяем что data список словарей
+def validate_transaction_list(data):
+    if not isinstance(data, list):
+        raise ValueError("Ожидался список транзакций (list)")
+    
+    if not all(isinstance(item, dict) for item in data):
+        raise ValueError("Каждая транзакция должна быть словарем (dict)")

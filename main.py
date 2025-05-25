@@ -1,5 +1,30 @@
-from transaction import list_transactions, add_transaction, delete_transaction, print_transaction, edit_transaction
-from category import add_category, delete_category, add_subcategory, delete_subcategory, rename_category, rename_subcategory, move_transactions
+from transaction import *
+from category import *
+from analysis import *
 
-move_transactions('expenses', 1, 'test1', '3', '1')
-#add_category('expenses', 'test1', ['1','2','3'])
+data = load_data()
+
+income = total_income(data)
+expenses = total_expenses(data)
+balance = total_balace(data)
+
+income_by_cat = sum_income_by_categories(data)
+expenses_by_cat = sum_expenses_by_categories(data)
+total, optional = count_optional_expenses(data)
+#income, expenses, balance = calculate_balance(data)
+#result = sum_by_categories(data)
+
+print()
+print(f"Доходы: {income}")
+print(f"Расходы: {expenses}")
+print(f"Разница: {balance}")
+
+print("\nСумма доходов по категориям:")
+for category, amount in income_by_cat.items():
+    print(f"{category}: {amount}")
+
+print("\nСумма расходов по категориям:")
+for category, amount in expenses_by_cat.items():
+    print(f"{category}: {amount}")
+
+print(f"\nВсего расходов: {total}| Из них необязательных расходов: {optional}")
