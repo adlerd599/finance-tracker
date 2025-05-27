@@ -59,3 +59,4 @@ def validate_transaction_list(data):
     
     if not all(isinstance(item, dict) for item in data):
         raise ValueError("Каждая транзакция должна быть словарем (dict)")
+    

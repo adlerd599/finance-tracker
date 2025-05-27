@@ -98,7 +98,7 @@ def add_transaction(amount, type_, category, subcategory="", description = "", d
             print("Ошибка: дата введена некорректно. Используйте формат ДД-ММ-ГГГГ.")
             return
     else:
-        valid_date = datetime.now().strf("%d-%m-%Y")
+        valid_date = datetime.now().strftime("%d-%m-%Y")
 
 
     # Генерация нового ID
@@ -126,20 +126,36 @@ def add_transaction(amount, type_, category, subcategory="", description = "", d
 
 # Функция delete_transaction(id) удаляет транзакцию по ее id в массиве data
 # Если транзакция не найдена, то выводит сообщение
+type_display = {
+    'income': 'Доходы',
+    'expenses': 'Расходы'
+}
 
 def delete_transaction(transaction_id):
     data = load_data()
     for i,item in enumerate(data):
-        if item.get("id") == str(transaction_id):
+        item_id = int(item.get("id"))
+        if item_id == int(transaction_id):
             removed = data.pop(i)
-            save_data(data)
-            print()
-            print(f"Удалена транзакция ID {transaction_id}: {removed["type_"]} - на сумму {removed["amount"]} от {removed["date"]}")
-            return
-        
-    print()    
-    print (f"Ошибка: Транзакция ID: {transaction_id} не найдена.")
 
+            type_map = {
+                'expenses': 'Расходы',
+                'income': 'Доходы'
+            }
+
+            type_of_transactions = type_map.get(removed.get('type_'), 'Неизвестно')
+
+            save_data(data)
+            return {
+                "success": True,
+                "message": f"Удалена транзакция ID {transaction_id} - на сумму {removed['amount']} от {removed['date']} \nТип: {type_of_transactions}, Категория: {removed['category']}"
+            }
+
+        
+    return {
+        "success": False,
+        "message": f"Транзакция ID {transaction_id} не найдена."
+    }
 
 
 # Функция edit_transaction() находит транзакцию по ID и позволяет изменить ее значения
