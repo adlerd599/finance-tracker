@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from transaction import add_transaction
+from transaction import update_transaction_by_id
 from category import load_categories
 from utils import validate_date
 from .utils_gui import validate_amount_input, validate_date_input, auto_format_date_input, remove_combobox_selection
@@ -13,34 +13,52 @@ type_display = {
 # Обратное соответствие:
 type_reverse = {v: k for k, v in type_display.items()}
 
-def create_add_transaction_ui(frame, categories_data, show_frame_callback, back_callback):
-    type_var = tk.StringVar()
-    category_var = tk.StringVar()
-    subcategory_var = tk.StringVar()
-    amount_var = tk.StringVar()
-    description_var = tk.StringVar()
-    date_var = tk.StringVar()
-    optional_var = tk.BooleanVar()
+def open_edit_form(frame, transaction, back_callback):
 
-    def reset_form_fields():
-        amount_var.set("")
-        description_var.set("")
-        date_var.set("")
-        type_var.set("")
-        category_var.set("")
-        subcategory_var.set("")
-        optional_var.set(False)
+    for widget in frame.winfo_children():
+        widget.destroy()
 
-        category_cb['values'] = []
-        subcategory_cb['values'] = []
-
-        subcategory_label.grid_forget()
-        subcategory_cb.grid_forget()
-        optional_cb.grid_forget()
+    updated_fields = {}
 
     def handle_back():
-        reset_form_fields()
+        type_displayed = type_var.get()
+        type_ = type_reverse.get(type_displayed, '')
+
+        if amount_var.get() != str(transaction['amount']):
+            updated_fields['amount'] = amount_var.get()
+        if type_ != transaction['type_']:
+            updated_fields['type_'] = type_
+        if category_var.get() != transaction['category']:
+            updated_fields['category'] = category_var.get()
+        if subcategory_var.get() != transaction.get('subcategory', ''):
+            updated_fields['subcategory'] = subcategory_var.get()
+        if description_var.get() != transaction.get('description', ''):
+            updated_fields['description'] = description_var.get()
+        if date_var.get() != transaction['date']:
+            updated_fields['date'] = date_var.get()
+        if optional_var.get() != transaction.get('optional', False):
+            updated_fields['optional'] = optional_var.get()
+
+        if updated_fields:
+            confirm = messagebox.askyesno(
+            "Подтверждение",
+            "Вы уверены, что хотите выйти?\nНесохранённые изменения будут потеряны."
+            )
+            if not confirm:
+                return
+        
         back_callback()
+
+    # --- Переменные ---
+    amount_var = tk.StringVar(value=str(transaction['amount']))
+    type_var = tk.StringVar(value=type_display[transaction['type_']])
+    category_var = tk.StringVar(value=transaction['category'])
+    subcategory_var = tk.StringVar(value=transaction.get('subcategory', ''))
+    description_var = tk.StringVar(value=transaction.get('description', ''))
+    date_var = tk.StringVar(value=transaction['date'])
+    optional_var = tk.BooleanVar(value=transaction.get('optional', False))
+
+    categories_data = load_categories()
 
     def update_categories(*args):
         type_displayed = type_var.get()
@@ -61,7 +79,7 @@ def create_add_transaction_ui(frame, categories_data, show_frame_callback, back_
         subcategory_cb['values'] = subcategories
         subcategory_var.set('')
 
-            # Делаем список неактивным, если подкатегорий нет
+        # Делаем список неактивным, если подкатегорий нет
         if subcategories:
             subcategory_cb.config(state='readonly')
         else:
@@ -81,55 +99,59 @@ def create_add_transaction_ui(frame, categories_data, show_frame_callback, back_
             subcategory_label.grid_forget()
             subcategory_cb.grid_forget()
             optional_cb.grid_forget()
-
-    def save_transaction():
+        
+    def handle_save():
         type_displayed = type_var.get()
         type_ = type_reverse.get(type_displayed, '')
-        categories_data = load_categories()
-        category = category_var.get()
-        date_str = date_var.get()
 
-        if not amount_var.get().strip():
-            messagebox.showerror("Ошибка", "Поле 'Сумма' обязательно для заполнения.")
-            return
-        if not type_var.get().strip():
-            messagebox.showerror("Ошибка", "Поле 'Тип' обязательно для заполнения.")
-            return
-        if not category_var.get().strip():
-            messagebox.showerror("Ошибка", "Поле 'Категория' обязательно для заполнения.")
-            return
-        if type_ == 'expenses':
-            subcategories = categories_data.get(type_, {}).get(category, [])
-            if subcategories and not subcategory_var.get().strip():
-                messagebox.showerror("Ошибка", "Поле 'Подкатегория' обязательно для заполнения.")
-                return
-            
         # Проверка даты
-        validated_date = validate_date(date_str)
-        if date_str.strip():
+        date_str = date_var.get()
+        if date_str != transaction['date']:
+            validated_date = validate_date(date_str)
             if not validated_date:
                 messagebox.showerror("Ошибка", "Неверный формат даты. Используйте ДД-ММ-ГГГГ.")
                 return
-    
-        try:
-            amount = float(amount_var.get())
-            type_displayed = type_var.get()
-            type_ = type_reverse.get(type_displayed, '')
-            category = category_var.get()
-            subcategory = subcategory_var.get() if type_ == 'expenses' else ''
-            description = description_var.get()
-            date_str = validated_date
-            optional = optional_var.get() if type_ == 'expenses' else False
 
-            add_transaction(amount, type_, category, subcategory, description, date_str, optional)
-            messagebox.showinfo("Успех", "Транзакция добавлена!")
-            reset_form_fields()
+        if amount_var.get() != str(transaction['amount']):
+            updated_fields['amount'] = amount_var.get()
+        if type_ != transaction['type_']:
+            updated_fields['type_'] = type_
+        if category_var.get() != transaction['category']:
+            updated_fields['category'] = category_var.get()
+        if subcategory_var.get() != transaction.get('subcategory', ''):
+            updated_fields['subcategory'] = subcategory_var.get()
+        if description_var.get() != transaction.get('description', ''):
+            updated_fields['description'] = description_var.get()
+        if date_var.get() != transaction['date']:
+            updated_fields['date'] = date_var.get()
+        if optional_var.get() != transaction.get('optional', False):
+            updated_fields['optional'] = optional_var.get()
+
+        if not category_var.get():
+            messagebox.showerror("Ошибка", "Пожалуйста, выберите категорию.")
+            return
+
+        if type_ == 'expenses':
+            subcategories = categories_data.get(type_, {}).get(category_var.get(), [])
+            if subcategories and not subcategory_var.get():
+                messagebox.showerror("Ошибка", "Пожалуйста, выберите подкатегорию.")
+                return
+
+        if not updated_fields:
+            messagebox.showinfo("Информация", "Изменений не обнаружено.")
+            return
+
+        result = update_transaction_by_id(transaction['id'], updated_fields)
+        if result['success']:
+            messagebox.showinfo("Успех", result['message'])
             back_callback()
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось добавить транзакцию: {e}")
+            return
+        else:
+            messagebox.showerror("Ошибка", result['message'])
+            return
 
-    # Внешний контейнер для центрирования по горизонтали
-    tk.Label(frame, text="Добавление транзакции:", font=("Arial", 14)).pack(pady=10)
+     # Внешний контейнер для центрирования по горизонтали
+    tk.Label(frame, text="Редактирование транзакции:", font=("Arial", 14)).pack(pady=10)
 
     center_wrapper = tk.Frame(frame)
     center_wrapper.pack(expand=True, anchor='n', pady=30)  # сверху, с отступом
@@ -183,10 +205,18 @@ def create_add_transaction_ui(frame, categories_data, show_frame_callback, back_
     subcategory_cb.bind('<<ComboboxSelected>>', remove_combobox_selection(subcategory_cb))
     optional_cb = ttk.Checkbutton(form, text="Необязательный расход", variable=optional_var)
 
+    # --- Восстановление логики интерфейса ---
+    update_categories()
+    category_var.set(transaction['category'])
+
+    update_subcategories()
+    subcategory_var.set(transaction.get('subcategory', ''))
+
+    toggle_expense_fields()
 
     # ======= Кнопки снизу =======
     buttons_frame = tk.Frame(frame)
     buttons_frame.pack(pady=20)
 
-    ttk.Button(buttons_frame, text="Сохранить", command=save_transaction).pack(side='left', padx=10)
+    ttk.Button(buttons_frame, text="Сохранить", command=handle_save).pack(side='left', padx=10)
     ttk.Button(buttons_frame, text="Назад", command=handle_back).pack(side='left', padx=10)

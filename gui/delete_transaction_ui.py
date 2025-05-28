@@ -1,25 +1,16 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from transaction import delete_transaction, load_data
+from transaction import delete_transaction
+from .utils_gui import find_transaction_by_id, validate_id_input
 
 def create_delete_transaction_ui(frame, back_callback):
     id_var = tk.StringVar()
 
-    def validate_id_input(new_value):
-        if new_value == "":
-            return True  # разрешаем очистку
-        return new_value.isdigit() and len(new_value) <= 6
-
     def handle_delete():
         transaction_id = id_var.get()
-        
-        if len(transaction_id) != 6:
-            messagebox.showerror("Ошибка", "ID должен содержать ровно 6 цифр.")
-            return
-        
-        data = load_data()
-        for item in data:
-            if str(item.get("id")) == transaction_id:
+        item = find_transaction_by_id(transaction_id)
+
+        if item:
                 # Найдена: показываем инфо и спрашиваем подтверждение
                 type_name = "Доходы" if item["type_"] == "income" else "Расходы"
                 summary = (
@@ -38,19 +29,18 @@ def create_delete_transaction_ui(frame, back_callback):
                 result = delete_transaction(transaction_id)
                 if result["success"]:
                     messagebox.showinfo("Успех", result["message"])
+                    id_var.set("")
+                    back_callback()
                 else:
                     messagebox.showerror("Ошибка", result["message"])
                 return
-
-        # Если не найдено
-        messagebox.showerror("Ошибка", f"Транзакция ID {transaction_id} не найдена.")
 
     def handle_back():
         id_var.set("")
         back_callback()
 
     # --- Форма ---
-    tk.Label(frame, text="Удаление транзакции по ID:", font=("Arial", 14)).pack(pady=10)
+    tk.Label(frame, text="Удаление транзакции:", font=("Arial", 14)).pack(pady=10)
 
     center_wrapper = tk.Frame(frame)
     center_wrapper.pack(expand=True, anchor='n', pady=30)  # сверху, с отступом
@@ -60,7 +50,7 @@ def create_delete_transaction_ui(frame, back_callback):
 
      # --- Поле ввода ID ---
     tk.Label(form, text="ID транзакции (6 цифр):").grid(row=0, column=0, padx=5, pady=5, sticky='e')
-    vcmd = frame.register(validate_id_input)  # <-- исправлено здесь
+    vcmd = frame.register(validate_id_input) 
     id_entry = tk.Entry(form, textvariable=id_var, validate='key', validatecommand=(vcmd, '%P'))
     id_entry.grid(row=0, column=1, padx=5, pady=5)
 

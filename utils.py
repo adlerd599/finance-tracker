@@ -4,7 +4,6 @@ import random
 import re
 from datetime import datetime
 
-
 # Функция validate_date() проверяет корректность введенной даты. Допускает любые разделители
 # Возвращает дату в формате ДД-ММ-ГГГГ или None если дата некорретна
 def validate_date(date_str):
@@ -14,11 +13,17 @@ def validate_date(date_str):
     try:
         # Пытаемся разобрать как дату в формате ДД-ММ-ГГГГ
         parsed_date = datetime.strptime(cleaned,"%d-%m-%Y")
+
+        # Проверка диапазона года
+        year = parsed_date.year
+        current_year = datetime.now().year
+        if not (1970 <= year <= current_year):
+            return None
+        
         return parsed_date.strftime("%d-%m-%Y")
     # Если дата введена некорректно, то возвращает None
     except ValueError:
         return None
-
 
 # Функция generate_transaction_id() - генерирует случайное 6-значное число
 # Проверяет, что это число не является id никакой другой транзакции
@@ -29,7 +34,6 @@ def generate_transaction_id(existing_ids):
         if new_id not in existing_ids:
             return new_id
 
-
 # Функция validate_not_empty() проверяет, что строка не пустая и не состоит только из пробелов
 # Возвращает True, если строка валидна, иначе печатает сообщение и возвращает False
 def validate_not_empty(value, field_name="значение"):
@@ -37,7 +41,6 @@ def validate_not_empty(value, field_name="значение"):
         print(f'Ошибка: "{field_name}" не может быть пустым')
         return False
     return True
-
 
 # Функция validate_type() проверяет корректность типов транзакций переданных как параметр
 def validate_type(type_):

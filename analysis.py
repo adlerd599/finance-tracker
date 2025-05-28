@@ -28,12 +28,15 @@ def filter_transactions_by_period(data, start_date, end_date):
     end = datetime.strptime(end, '%d-%m-%Y')
 
     # Фильтрация
-    filtred_list = []
+    filtered_list = []
     for transaction in data:
         if start <= datetime.strptime(transaction['date'], '%d-%m-%Y') <= end:
-            filtred_list.append(transaction)
+            filtered_list.append(transaction)
 
-    return filtred_list
+    # Сортировка по дате (от меньшей к большей)
+    sorted_list = sorted(filtered_list, key=lambda t: datetime.strptime(t['date'], '%d-%m-%Y'))
+
+    return sorted_list
 
 # Сyммирует доходы по категориям
 def sum_income_by_categories(data):
