@@ -36,24 +36,53 @@ def generate_transaction_id(existing_ids):
 
 # Функция validate_not_empty() проверяет, что строка не пустая и не состоит только из пробелов
 # Возвращает True, если строка валидна, иначе печатает сообщение и возвращает False
-def validate_not_empty(value, field_name="значение"):
-    if not value.strip():
-        print(f'Ошибка: "{field_name}" не может быть пустым')
+def validate_not_empty(value):
+    return isinstance(value, str) and bool(value.strip())
+
+def validate_string(value):
+    if not isinstance(value, str) or not value.strip():
         return False
-    return True
+    return value.strip().capitalize()
 
 # Функция validate_type() проверяет корректность типов транзакций переданных как параметр
 def validate_type(type_):
-    if not isinstance(type_, str):
-        print()
-        print("Тип транзакции обязан быть строкой!")
-        return
-    
-    if type_.lower().strip() not in ('income', 'expenses'):
-        print()
-        print("Ошибка: допустимые значения — 'income' или 'expenses'")
+
+    if not validate_not_empty(type_):
         return False
-    return True
+    
+    type_ = type_.strip().lower()
+    if type_ not in ('income', 'expenses'):
+        return False
+    
+    return type_
+
+# Проверяет категорию на корректность ввода и существование
+# Возвращает имя категории без отступов
+def validate_category(categories, type_, category):
+
+    validated_category = validate_string(category)
+    if not validated_category:
+        return False
+    else:
+        category = validated_category
+    
+    if category not in categories[type_]:
+        return False 
+    
+    return category
+
+# Проверяем подкатегории
+def validate_subcategory(categories, type_, category, subcategory):
+
+    if not validate_string(subcategory):
+        return False
+    else:
+        subcategory = validate_string(subcategory)
+
+    if not subcategory in categories[type_][category]:
+        return False
+    
+    return subcategory 
 
 # Проверяем что data список словарей
 def validate_transaction_list(data):

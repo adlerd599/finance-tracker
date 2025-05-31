@@ -149,15 +149,27 @@ def open_edit_form(frame, transaction, back_callback):
         else:
             messagebox.showerror("Ошибка", result['message'])
             return
-
+    
      # Внешний контейнер для центрирования по горизонтали
-    tk.Label(frame, text="Редактирование транзакции:", font=("Arial", 14)).pack(pady=10)
+    # tk.Label(frame, text="Редактирование транзакции:", font=("Helvetica", 12)).pack(pady=10)
 
     center_wrapper = tk.Frame(frame)
-    center_wrapper.pack(expand=True, anchor='n', pady=30)  # сверху, с отступом
+    center_wrapper.pack(expand=True, anchor='n')  # сверху, с отступом
 
     form = tk.Frame(center_wrapper)
     form.pack()
+
+    # Настраиваем форму, чтобы колонка расширялась
+    form.columnconfigure(0, weight=1)
+
+    # --- Рамка ---
+    around_frame = tk.LabelFrame(form, text="Редактирование транзакции", padx=10, pady=10, width=700, height=200)
+    around_frame.grid(row=0, column=0, sticky='ew', padx=10, pady=5)
+    around_frame.grid_propagate(False)
+
+    around_column_1 = tk.Frame(around_frame)
+    around_column_1.grid(row=0, column=0, sticky='ew', padx=10, pady=5)
+
 
     # Длина столбца
     label_width = 16
@@ -165,20 +177,20 @@ def open_edit_form(frame, transaction, back_callback):
     # ======= Левая часть =======
 
     # ---Сумма ---
-    vcmd = form.register(validate_amount_input)
-    tk.Label(form, text="Сумма:", width=label_width, anchor='w').grid(row=0, column=0, sticky='w', padx=0, pady=5)
-    amount_entry = tk.Entry(form, textvariable=amount_var, validate='key', validatecommand=(vcmd, '%P'))
+    vcmd = around_column_1.register(validate_amount_input)
+    tk.Label(around_column_1, text="Сумма:", width=label_width, anchor='w').grid(row=0, column=0, sticky='w', padx=0, pady=5)
+    amount_entry = tk.Entry(around_column_1, textvariable=amount_var, validate='key', validatecommand=(vcmd, '%P'))
     amount_entry.grid(row=0, column=1, padx=10, pady=5)
 
     # --- Описание ---
-    tk.Label(form, text="Описание:", width=label_width, anchor='w').grid(row=1, column=0, sticky='w', padx=0, pady=5)
-    tk.Entry(form, textvariable=description_var).grid(row=1, column=1, padx=10, pady=5)
+    tk.Label(around_column_1, text="Описание:", width=label_width, anchor='w').grid(row=1, column=0, sticky='w', padx=0, pady=5)
+    tk.Entry(around_column_1, textvariable=description_var).grid(row=1, column=1, padx=10, pady=5)
 
     # --- Дата ---
-    tk.Label(form, text="Дата (ДД-ММ-ГГГГ):", width=label_width, anchor='w').grid(row=2, column=0, sticky='w', padx=0, pady=5)
+    tk.Label(around_column_1, text="Дата (ДД-ММ-ГГГГ):", width=label_width, anchor='w').grid(row=2, column=0, sticky='w', padx=0, pady=5)
     # Привязываем валидацию
-    vcmd = (form.register(validate_date_input), "%P")
-    date_entry = ttk.Entry(form, textvariable=date_var, validate="key", validatecommand=vcmd)
+    vcmd = (around_column_1.register(validate_date_input), "%P")
+    date_entry = ttk.Entry(around_column_1, textvariable=date_var, validate="key", validatecommand=vcmd)
     date_entry.grid(row=2, column=1, padx=10, pady=5)
 
     # Привязываем автоформатирование после каждой клавиши
@@ -187,23 +199,23 @@ def open_edit_form(frame, transaction, back_callback):
     # ======= Правая часть =======
 
     # --- Тип ---
-    tk.Label(form, text="Тип:", width=label_width, anchor='w').grid(row=0, column=2, sticky='w', padx=0, pady=5)
-    type_cb = ttk.Combobox(form, textvariable=type_var, state='readonly')
+    tk.Label(around_column_1, text="Тип:", width=label_width, anchor='w').grid(row=0, column=2, sticky='w', padx=0, pady=5)
+    type_cb = ttk.Combobox(around_column_1, textvariable=type_var, state='readonly')
     type_cb['values'] = list(type_display.values())
     type_cb.grid(row=0, column=3, padx=0, pady=5)
     type_cb.bind('<<ComboboxSelected>>', update_categories)
 
     # --- Категория ---
-    tk.Label(form, text="Категория:", width=label_width, anchor='w').grid(row=1, column=2, sticky='w', padx=0, pady=5)
-    category_cb = ttk.Combobox(form, textvariable=category_var, state='readonly')
+    tk.Label(around_column_1, text="Категория:", width=label_width, anchor='w').grid(row=1, column=2, sticky='w', padx=0, pady=5)
+    category_cb = ttk.Combobox(around_column_1, textvariable=category_var, state='readonly')
     category_cb.grid(row=1, column=3, padx=0, pady=0)
     category_cb.bind('<<ComboboxSelected>>', update_subcategories)
 
     # --- Подкатегория ---
-    subcategory_label = tk.Label(form, text="Подкатегория:", width=label_width, anchor='w')
-    subcategory_cb = ttk.Combobox(form, textvariable=subcategory_var, state='readonly')
+    subcategory_label = tk.Label(around_column_1, text="Подкатегория:", width=label_width, anchor='w')
+    subcategory_cb = ttk.Combobox(around_column_1, textvariable=subcategory_var, state='readonly')
     subcategory_cb.bind('<<ComboboxSelected>>', remove_combobox_selection(subcategory_cb))
-    optional_cb = ttk.Checkbutton(form, text="Необязательный расход", variable=optional_var)
+    optional_cb = ttk.Checkbutton(around_column_1, text="Необязательный расход", variable=optional_var)
 
     # --- Восстановление логики интерфейса ---
     update_categories()

@@ -43,7 +43,8 @@ def create_transaction_filter_window(frame, back_callback):
             try:
                 n = int(last_n_var.get())
                 result = transactions[-n:][::-1]
-                show_filtered_transactions(result)
+                sort_by = f"по последним {n} добавленным"
+                show_filtered_transactions(result, sort_by)
             except ValueError:
                 messagebox.showerror("Ошибка", "Введите корректное количество транзакций.")
         else:
@@ -69,27 +70,42 @@ def create_transaction_filter_window(frame, back_callback):
             if result is None:
                 messagebox.showerror("Ошибка", "Ошибка при фильтрации по датам.")
                 return
-
-            show_filtered_transactions(result)
-
-    # Заголовок
-    tk.Label(frame, text="Фильтрация:", font=("Arial", 14)).pack(pady=10)
+            
+            if result:
+                sort_by = f"от {validated_from} до {validated_to}"
+                show_filtered_transactions(result, sort_by)
+            else :
+                messagebox.showerror("Ошибка", "Транзакции не найдены.")
 
     # Внешний контейнер для центрирования по горизонтали
     center_wrapper = tk.Frame(frame)
-    center_wrapper.pack(expand=True, anchor='n', pady=30)  # сверху, с отступом
+    center_wrapper.pack(expand=True, anchor='n')  # сверху, с отступом
 
     form = tk.Frame(center_wrapper)
     form.pack()
 
+    # Настраиваем форму, чтобы колонка расширялась
+    form.columnconfigure(0, weight=1)
+
+    # --- Категория ---
+    filter_frame = tk.LabelFrame(form, text="Фильтрация транзакций", padx=10, pady=10, width=700, height=350)
+    filter_frame.grid(row=0, column=0, sticky='ew', padx=10, pady=5)
+    filter_frame.grid_propagate(False)
+    filter_frame.columnconfigure(0, weight=1)  # Чтобы содержимое могло центрироваться
+
+    # Обёртка для колонок
+    filter_inner = tk.Frame(filter_frame)
+    filter_inner.place(relx=0.5, rely=0.5, anchor='center')  # <-- Центрирование по вертикали и горизонтали
+
+
     # Вложенный фрейм для полей даты
-    date_frame = tk.Frame(form)
+    date_frame = tk.Frame(filter_inner)
     date_frame.grid(row=1, column=0, sticky="w", padx=50, pady=5)
     vcmd = (date_frame.register(validate_date_input), "%P")
 
 
     # --- Радио-кнопка "По дате" ---
-    tk.Radiobutton(form, text="Фильтр по дате:", variable=filter_mode, value="date",
+    tk.Radiobutton(filter_inner, text="Фильтр по дате:", variable=filter_mode, value="date",
                    command=toggle_filter_inputs).grid(row=0, column=0, sticky="w", padx=5, pady=5)
 
     tk.Label(date_frame, text="от:").grid(row=1, column=0, sticky='e', padx=10)
@@ -106,10 +122,10 @@ def create_transaction_filter_window(frame, back_callback):
 
 
     # --- Радио-кнопка "Последние N транзакций" ---
-    tk.Radiobutton(form, text="Последние транзакции:", variable=filter_mode, value="last",
-                   command=toggle_filter_inputs).grid(row=2, column=0, sticky="w", padx=5, pady=5)
+    tk.Radiobutton(filter_inner, text="Последние добавленные транзакции:", variable=filter_mode, value="last",
+                   command=toggle_filter_inputs).grid(row=2, column=0, sticky="w", padx=5, pady=(50,0))
 
-    last_frame = tk.Frame(form)
+    last_frame = tk.Frame(filter_inner)
     last_frame.grid(row=3, column=0, sticky="w", padx=50, pady=5)
 
     tk.Label(last_frame, text="Показать всего:").grid(row=3, column=0, sticky='e', padx=10)

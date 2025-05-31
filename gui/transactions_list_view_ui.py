@@ -1,26 +1,26 @@
 import tkinter as tk
 from tkinter import ttk
 
-def show_filtered_transactions(transactions, frame=None):
-    if frame is None:
-        frame = tk.Toplevel()
-        frame.title("Список транзакций")
-        frame.geometry("1000x700")
+def show_filtered_transactions(transactions, sort_by):
+    frame = tk.Toplevel()
+    frame.title("Список транзакций")
+    frame.geometry("1000x700")
 
     for widget in frame.winfo_children():
         widget.destroy()
 
     # Заголовок
-    tk.Label(frame, text="Список транзакций", font=("Arial", 14)).pack(pady=10)
+    tk.Label(frame, text=f"Список | Фильтрация: {sort_by}", font=("Helvetica", 12)).pack(pady=10)
 
     # Обертка под Treeview + скроллбар
     tree_frame = tk.Frame(frame)
     tree_frame.pack(fill='both', expand=True, padx=10, pady=10)
 
-    columns = ("id","amount", "type", "category", "subcategory", "description", "optional", "date")
+    columns = ("#","id","amount", "type", "category", "subcategory", "description", "optional", "date")
     tree = ttk.Treeview(tree_frame, columns=columns, show='headings')
 
     # Заголовки столбцов
+    tree.heading("#", text="#")
     tree.heading("id", text="ID")
     tree.heading("amount", text="Сумма")
     tree.heading("type", text="Тип")
@@ -31,6 +31,7 @@ def show_filtered_transactions(transactions, frame=None):
     tree.heading("date", text="Дата")
 
     # Настройки ширины (можно подстроить)
+    tree.column("#", width=40, anchor="center")
     tree.column("id", width=80, anchor="center")
     tree.column("amount", width=80, anchor="center")
     tree.column("type", width=100, anchor="center")
@@ -56,7 +57,9 @@ def show_filtered_transactions(transactions, frame=None):
 
     for index, tx in enumerate(transactions):
         tag = 'evenrow' if index % 2 == 0 else 'oddrow'
+        number = index + 1
         tree.insert('', 'end', values=(
+            number, 
             tx.get("id", ""),
             f'{tx.get("amount", 0):.2f}',
             "Доход" if tx.get("type_") == "income" else "Расход",
@@ -68,4 +71,4 @@ def show_filtered_transactions(transactions, frame=None):
         ), tags=(tag,))
 
     # Кнопка "Назад"
-    ttk.Button(frame, text="Назад", command=lambda: frame.pack_forget() if hasattr(frame, 'pack') else frame.destroy()).pack(pady=10)
+    ttk.Button(frame, text="Закрыть", command=lambda: frame.pack_forget() if hasattr(frame, 'pack') else frame.destroy()).pack(pady=10)
