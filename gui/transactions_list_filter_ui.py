@@ -66,15 +66,23 @@ def create_transaction_filter_window(frame, back_callback):
                 messagebox.showerror("Ошибка", "Дата 'от' не может быть позже даты 'до'.")
                 return
 
-            result = filter_transactions_by_period(transactions, date_from, date_to)
-            if result is None:
-                messagebox.showerror("Ошибка", "Ошибка при фильтрации по датам.")
+            response = filter_transactions_by_period(transactions, date_from, date_to)
+
+            if not response["success"]:
+                messagebox.showerror("Ошибка", response["message"])
                 return
-            
+
+            result = response["transactions"]
+
             if result:
+                # print("== Отфильтрованные транзакции ==")
+                # for tx in result:
+                #     print(tx)
+                # print(f"Найдено транзакций: {len(result)}")
+                # print(f"Фильтрация от {validated_from} до {validated_to}")
                 sort_by = f"от {validated_from} до {validated_to}"
                 show_filtered_transactions(result, sort_by)
-            else :
+            else:
                 messagebox.showerror("Ошибка", "Транзакции не найдены.")
 
     # Внешний контейнер для центрирования по горизонтали

@@ -32,8 +32,8 @@ CATEGORY_PATH = os.path.join(DATA_DIR, "categories.json")
 # Запуск GUI
 from gui.main_gui import run_gui
 
-print("DATA_FILE:", DATA_FILE)
-print("CATEGORY_PATH:", CATEGORY_PATH)
+# print("DATA_FILE:", DATA_FILE)
+# print("CATEGORY_PATH:", CATEGORY_PATH)
 
 if __name__ == "__main__":
     run_gui()
