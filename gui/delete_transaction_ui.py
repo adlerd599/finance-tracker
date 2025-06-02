@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from app.transaction import delete_transaction
-from .utils_gui import find_transaction_by_id, validate_id_input
+from gui.utils_gui import find_transaction_by_id, validate_id_input
 
 def create_delete_transaction_ui(frame, back_callback):
     id_var = tk.StringVar()

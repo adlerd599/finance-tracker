@@ -11,7 +11,7 @@ from gui.cat_and_sub.cat_and_sub_rename_ui import create_rename_ui
 from gui.cat_and_sub.cat_and_sub_delete_ui import create_delete_ui
 from gui.cat_and_sub.cat_and_sub_add_ui import create_add_ui
 from gui.reports_gui.report_filter_ui import create_report_filter_window
-from .utils_gui import show_frame
+from gui.utils_gui import show_frame
 
 def run_gui():
 
@@ -91,12 +91,11 @@ def run_gui():
     main_button_container = tk.Frame(main_menu)
     main_button_container.pack(expand=True)
 
-    ttk.Button(main_button_container, text="Управление транзакциями", width=40, command=lambda: [root.title("Управление финансами | Транзакции"), show_frame(transactions_menu, frame_data)]).pack(pady=5)
-    ttk.Button(main_button_container, text="Управление категориями", width=40, command=lambda: [root.title("Управление финансами | Категории и подкатегории"), show_frame(cat_and_sub_menu, frame_data)]).pack(pady=5)
-    ttk.Button(main_button_container, text="Генерация отчёта", width=40, 
-               command=lambda: [root.title("Управление финансами | Генерация отчёта"), 
+    ttk.Button(main_button_container, text="Транзакции", width=40, command=lambda: [root.title("Управление финансами | Транзакции"), show_frame(transactions_menu, frame_data)]).pack(pady=5)
+    ttk.Button(main_button_container, text="Категории и подкатегории", width=40, command=lambda: [root.title("Управление финансами | Категории и подкатегории"), show_frame(cat_and_sub_menu, frame_data)]).pack(pady=5)
+    ttk.Button(main_button_container, text="Отчётность", width=40, 
+               command=lambda: [root.title("Управление финансами | Отчётность"), 
                                 create_report_filter_window(reports_filter_frame, frame_data, back_to_main)]).pack(pady=5)
-    ttk.Button(main_button_container, text="Отчёты", width=40, command=lambda: messagebox.showinfo('Отчёты', 'Окно с отчетами')).pack(pady=5)
     ttk.Button(main_button_container, text="Выход", width=40, command=confirm_exit).pack(pady=5)
 
 
@@ -104,13 +103,13 @@ def run_gui():
     transactions_button_container = tk.Frame(transactions_menu)
     transactions_button_container.pack(expand=True)
 
-    ttk.Button(transactions_button_container, text="Добавить транзакцию", width=40, 
+    ttk.Button(transactions_button_container, text="Добавление", width=40, 
                command=lambda: [root.title("Управление финансами | Транзакции | Добавление транзакции"), 
                                 create_add_transaction_ui(add_transaction_frame, frame_data, back_to_transactions)]).pack(pady=5)
-    ttk.Button(transactions_button_container, text="Удалить транзакцию", width=40, 
+    ttk.Button(transactions_button_container, text="Удаление", width=40, 
                command=lambda: [root.title("Управление финансами | Транзакции | Удаление транзакции"), 
                                 show_frame(delete_transaction_frame, frame_data)]).pack(pady=5)
-    ttk.Button(transactions_button_container, text="Изменить транзакцию", width=40, command=go_to_edit_transaction).pack(pady=5)
+    ttk.Button(transactions_button_container, text="Изменение", width=40, command=go_to_edit_transaction).pack(pady=5)
     ttk.Button(transactions_button_container, text="Список транзакций", width=40, command=go_list_of_transactions).pack(pady=5)
     ttk.Button(transactions_button_container, text="Назад", command=back_to_main, width=40).pack(pady=5)
 

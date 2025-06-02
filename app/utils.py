@@ -2,6 +2,8 @@
 
 import random
 import re
+import os
+import sys
 from datetime import datetime
 
 # Функция validate_date() проверяет корректность введенной даты. Допускает любые разделители
@@ -91,4 +93,11 @@ def validate_transaction_list(data):
     
     if not all(isinstance(item, dict) for item in data):
         raise ValueError("Каждая транзакция должна быть словарем (dict)")
+    
+# Путь
+def get_base_path():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
+
     

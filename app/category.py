@@ -3,11 +3,17 @@
 import json
 import os
 from tkinter import messagebox
-from transaction import load_data, save_data
-from utils import validate_type, validate_category, validate_subcategory, validate_string
+from app.transaction import load_data, save_data
+from app.utils import validate_type, validate_category, validate_subcategory, validate_string, get_base_path
+
+BASE_DIR = get_base_path()
+DATA_DIR = os.path.join(BASE_DIR, "data")
 
 # Создаем корректный путь к json файлу
-CATEGORY_PATH = os.path.join("data", "categories.json")
+# Глобальные пути
+BASE_DIR = get_base_path()
+DATA_DIR = os.path.join(BASE_DIR, "data")
+CATEGORY_PATH = os.path.join(DATA_DIR, "categories.json")
 
 # Функция load_categories() преобразует json файл в словарь и возвращает этот словарь
 def load_categories():

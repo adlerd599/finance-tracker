@@ -38,6 +38,26 @@ def create_report_filter_window(frame, data, back_callback):
         if result['success']:
             filtered = result['transactions']
 
+            raw_expenses = sum_expenses_by_categories(filtered)
+            if raw_expenses:
+                total_exp = total_expenses(filtered)
+
+                expenses_grouped = {}
+                others_total = 0
+                others_detail = {}
+
+                for category, amount in raw_expenses.items():
+                    percent = amount / total_exp
+                    if percent >= 0.04:
+                        expenses_grouped[category] = amount
+                    else:
+                        others_total += amount
+                        others_detail[category] = amount
+
+                if others_total > 0:
+                    expenses_grouped["Прочее"] = others_total  
+            
+
              # Строим словарь с данными отчета
             report_data = {
                 "report_name": report_name if report_name else None,
@@ -50,14 +70,12 @@ def create_report_filter_window(frame, data, back_callback):
                 },
                 "categories": {
                     "income": sum_income_by_categories(filtered),
-                    "expenses": sum_expenses_by_categories(filtered),
+                    "expenses": expenses_grouped,
+                    "expenses_others_detail": others_detail,
                     "expenses_by_sub": sum_by_sub_for_expenses(filtered),
                 },
-                "optional_expenses": {
-                    "total": count_optional_expenses(filtered)[0],
-                    "optional": count_optional_expenses(filtered)[1],
-                },
-                "transactions": filtered
+                "optional_expenses": count_optional_expenses(filtered),
+                "transactions": filtered,
             }
 
             show_report(report_data)
@@ -69,48 +87,33 @@ def create_report_filter_window(frame, data, back_callback):
         else:
             messagebox.showerror("Ошибка", result["message"])
 
-    # --- Центрирующая обёртка ---
+    # --- Форма ---
     center_wrapper = tk.Frame(frame)
-    center_wrapper.pack(expand=True, anchor='n')
+    center_wrapper.pack(expand=True, anchor='n')  # сверху, с отступом
 
     form = tk.Frame(center_wrapper)
     form.pack()
 
-    form.columnconfigure(0, weight=1)
+    # --- Рамка ---
+    around_frame = tk.LabelFrame(form, text="Генерация отчёта", padx=10, pady=10, width=700, height=200)
+    around_frame.grid(row=0, column=0, sticky='ew', padx=10, pady=5)
+    around_frame.grid_propagate(False)
+    around_frame.columnconfigure(0, weight=1)  # Чтобы содержимое могло центрироваться
 
-    # --- Рамка фильтров ---
-    filter_frame = tk.LabelFrame(form, text="Генерация отчёта", padx=20, pady=20, width=700, height=350)
-    filter_frame.grid(row=0, column=0, sticky='ew', padx=10, pady=10)
-    filter_frame.grid_propagate(False)
-    filter_frame.columnconfigure(0, weight=1)
+    # Обёртка для колонок
+    around_inner = tk.Frame(around_frame)
+    around_inner.place(relx=0.5, rely=0.5, anchor='center')  # <-- Центрирование по вертикали и горизонтали
 
-    # --- Центрированная обёртка ---
-    filter_inner = tk.Frame(filter_frame)
-    filter_inner.place(relx=0.5, rely=0.5, anchor="center")
+    vcmd = (around_inner.register(validate_date_input), "%P")
 
-    # --- Название отчета ---
-    name_frame = tk.Frame(filter_inner)
-    name_frame.grid(row=0, column=0, pady=10, sticky='w')
+    tk.Label(around_inner, text="Период отчётности:").grid(row=0, column=0, columnspan=4, sticky='w')
 
-    tk.Label(name_frame, text="Название отчёта (необязательно):").grid(row=0, column=0, sticky="w", padx=(0, 10))
-    tk.Entry(name_frame, textvariable=report_name_var, width=40).grid(row=1, column=0, pady=5)
-
-    # --- Период отчётности ---
-    date_frame = tk.Frame(filter_inner)
-    date_frame.grid(row=1, column=0, pady=10, sticky='w')
-    date_frame.columnconfigure((0, 2), weight=0)
-    date_frame.columnconfigure((1, 3), weight=1, uniform='date')
-
-    vcmd = (date_frame.register(validate_date_input), "%P")
-
-    tk.Label(date_frame, text="Период отчётности:").grid(row=0, column=0, columnspan=4, sticky='w', pady=(0, 5))
-
-    tk.Label(date_frame, text="от:").grid(row=1, column=0, sticky='e', padx=(0, 5))
-    date_from_entry = tk.Entry(date_frame, textvariable=date_from_var, validate="key", validatecommand=vcmd, width=15)
+    tk.Label(around_inner, text="от:").grid(row=1, column=0, sticky='e', padx=(0, 5))
+    date_from_entry = tk.Entry(around_inner, textvariable=date_from_var, validate="key", validatecommand=vcmd, width=15)
     date_from_entry.grid(row=1, column=1, padx=(0, 10))
 
-    tk.Label(date_frame, text="до:").grid(row=1, column=2, sticky='e', padx=(0, 5))
-    date_to_entry = tk.Entry(date_frame, textvariable=date_to_var, validate="key", validatecommand=vcmd, width=15)
+    tk.Label(around_inner, text="до:").grid(row=1, column=2, sticky='e', padx=(0, 5))
+    date_to_entry = tk.Entry(around_inner, textvariable=date_to_var, validate="key", validatecommand=vcmd, width=15)
     date_to_entry.grid(row=1, column=3)
 
     # Автоформат даты
@@ -121,5 +124,5 @@ def create_report_filter_window(frame, data, back_callback):
     buttons_frame = tk.Frame(frame)
     buttons_frame.pack(pady=20)
 
-    ttk.Button(buttons_frame, text="Создать", command=handle_generate_report).pack(side="left", padx=10)
+    ttk.Button(buttons_frame, text="Просмотр", command=handle_generate_report).pack(side="left", padx=10)
     ttk.Button(buttons_frame, text="Назад", command=back_callback).pack(side="left", padx=10)

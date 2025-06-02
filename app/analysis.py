@@ -1,7 +1,6 @@
-from transaction import load_data
 from datetime import datetime
 from collections import defaultdict
-from utils import validate_date, validate_transaction_list
+from app.utils import validate_date, validate_transaction_list
 
 # Фильтрует транзакции по дате
 def filter_transactions_by_period(data, start_date, end_date):
@@ -139,9 +138,9 @@ def count_optional_expenses(data):
                 optional += transaction.get('amount', 0)
 
     # Округляем
-    total = round(total, 2)
+    # total = round(total, 2)
     optional = round(optional, 2)
-    return total, optional
+    return optional
 
 # Считает все доходы 
 def total_income(data):

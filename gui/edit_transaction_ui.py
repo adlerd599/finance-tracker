@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox
 from app.transaction import update_transaction_by_id
 from app.category import load_categories
 from app.utils import validate_date
-from .utils_gui import validate_amount_input, validate_date_input, auto_format_date_input, remove_combobox_selection
+from gui.utils_gui import validate_amount_input, validate_date_input, auto_format_date_input, remove_combobox_selection
 
 type_display = {
     'income': 'Доходы',

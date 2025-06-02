@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from .utils_gui import find_transaction_by_id, validate_id_input, show_frame
-from .edit_transaction_ui import open_edit_form
+from gui.utils_gui import find_transaction_by_id, validate_id_input, show_frame
+from gui.edit_transaction_ui import open_edit_form
 
 def create_find_transaction_to_edit_ui(frame_search, frame_edit, data, back_callback):
     

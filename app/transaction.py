@@ -4,10 +4,15 @@
 import os 
 import json
 from datetime import datetime
-from utils import generate_transaction_id, validate_date
+from app.utils import generate_transaction_id, validate_date, get_base_path
 
 # Это функция из модуля os, которая соединяет части пути (папки, имена файлов) так, как это принято в операционной системе, на которой работает программа.
-DATA_FILE = os.path.join("data", "finance_data.json")
+# DATA_FILE = os.path.join("data", "finance_data.json")
+# Получаем путь к директории, где лежит main.py или main.exe
+# Глобальные пути
+BASE_DIR = get_base_path()
+DATA_DIR = os.path.join(BASE_DIR, "data")
+DATA_FILE = os.path.join(DATA_DIR, "finance_data.json")
 
 # Функция load_data() получает список со всеми операциями.
 # Сначала проверяет существует ли файл DATA_FILE, если нет - то возвращает пустой массив.

@@ -4,8 +4,8 @@ from datetime import datetime
 from app.analysis import filter_transactions_by_period
 from app.utils import validate_date
 from app.transaction import load_data  
-from .transactions_list_view_ui import show_filtered_transactions
-from .utils_gui import validate_date_input, auto_format_date_input, remove_combobox_selection
+from gui.transactions_list_view_ui import show_filtered_transactions
+from gui.utils_gui import validate_date_input, auto_format_date_input, remove_combobox_selection
 
 def create_transaction_filter_window(frame, back_callback):
     for widget in frame.winfo_children():
