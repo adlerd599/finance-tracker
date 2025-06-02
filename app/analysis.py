@@ -12,31 +12,49 @@ def filter_transactions_by_period(data, start_date, end_date):
     # Проверяем, что дата начала периода корректна
     start = validate_date(start_date)
     if not start:
-        print()
-        print("Дата начала периода задана не корректно")
-        return
+        return {
+        "success": False,
+        "message": f"Дата начала периода задана не корректно"
+    }
     
     start = datetime.strptime(start, '%d-%m-%Y')
 
     # Проверяем, что дата конца периода задана корректно
     end = validate_date(end_date)
     if not end:
-        print()
-        print("Дата конца периода задана не корректно")
-        return
+        return {
+        "success": False,
+        "message": "Дата конца периода задана не корректно"
+    }
     
     end = datetime.strptime(end, '%d-%m-%Y')
+
+    # Сравнение дат
+    if start > end:
+        return {
+        "success": False,
+        "message": "Дата 'от' не может быть позже даты 'до'."
+    }
 
     # Фильтрация
     filtered_list = []
     for transaction in data:
         if start <= datetime.strptime(transaction['date'], '%d-%m-%Y') <= end:
             filtered_list.append(transaction)
+        
+    if not filtered_list:
+        return {
+        "success": False,
+        "message": "Транзакции за указанный промежуток не найдены"
+    }
 
     # Сортировка по дате (от меньшей к большей)
     sorted_list = sorted(filtered_list, key=lambda t: datetime.strptime(t['date'], '%d-%m-%Y'))
 
-    return sorted_list
+    return {
+        "success": True,
+        "transactions": sorted_list
+    }
 
 # Сyммирует доходы по категориям
 def sum_income_by_categories(data):
@@ -141,5 +159,5 @@ def total_expenses(data):
 def total_balace(data):
     income = round(sum([t['amount'] for t in data if t['type_'] == 'income']), 2)
     expenses = round(sum([t['amount'] for t in data if t['type_'] == 'expenses']), 2)
-    balance = income - expenses
+    balance = round(income - expenses, 2)
     return balance

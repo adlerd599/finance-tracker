@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from category import load_categories, transfer_transactions
+from app.category import load_categories, transfer_transactions
 from gui.utils_gui import show_frame
 
 type_display = {
@@ -68,7 +68,6 @@ def create_move_transaction_ui(frame, data, back_callback):
     def handle_move():
         type_displayed = type_var.get()
         type_ = type_reverse.get(type_displayed, '')
-        # type_ = type_var.get()
         old_cat = old_cat_var.get()
         new_cat = new_cat_var.get()
         old_sub = old_sub_var.get().strip() or None

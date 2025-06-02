@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from gui.utils_gui import show_frame
-from category import load_categories, delete_category, delete_subcategory
+from app.category import load_categories, delete_category, delete_subcategory
 
 type_display = {
     'income': 'Доходы',
@@ -59,6 +59,15 @@ def create_delete_ui(frame, data, back_callback):
                 update_category_list(type_cat_var, only_with_subcategories=False)
             else:
                 messagebox.showerror("Ошибка", result["message"])
+                 # Очистка полей
+                type_cat_var.set("")
+                category_var.set("")
+
+                old_cat_cb.configure(values=[])
+                set_state(cat_column_1, "disabled")
+                type_cb_1.config(state='readonly')
+
+                update_category_list(type_cat_var, only_with_subcategories=False)
 
         else:  # mode == subcategory
             type_display_name = type_sub_var.get().strip()
@@ -94,6 +103,16 @@ def create_delete_ui(frame, data, back_callback):
                 update_category_list(type_sub_var, only_with_subcategories=True)
             else:
                 messagebox.showerror("Ошибка", result["message"])
+                # Очистка полей
+                type_sub_var.set("")
+                parent_cat_var.set("")
+                subcategory_var.set("")
+                set_state(sub_column_1, "disabled")
+                type_cb_2.config(state='readonly')
+
+                parent_cat_cb.configure(values=[])
+                old_sub_cb.configure(values=[])
+                update_category_list(type_sub_var, only_with_subcategories=True)
 
     def update_category_list(type_, only_with_subcategories=False):
         type_key = type_reverse.get(type_.get())

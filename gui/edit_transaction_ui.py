@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from transaction import update_transaction_by_id
-from category import load_categories
-from utils import validate_date
+from app.transaction import update_transaction_by_id
+from app.category import load_categories
+from app.utils import validate_date
 from .utils_gui import validate_amount_input, validate_date_input, auto_format_date_input, remove_combobox_selection
 
 type_display = {
@@ -99,6 +99,7 @@ def open_edit_form(frame, transaction, back_callback):
             subcategory_label.grid_forget()
             subcategory_cb.grid_forget()
             optional_cb.grid_forget()
+            optional_var.set(False)
         
     def handle_save():
         type_displayed = type_var.get()

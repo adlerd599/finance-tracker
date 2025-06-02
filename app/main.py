@@ -1,3 +1,9 @@
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from gui.main_gui import run_gui
 
 if __name__ == "__main__":

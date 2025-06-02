@@ -10,12 +10,10 @@ from gui.cat_and_sub.cat_and_sub_list_ui import create_cat_and_sub_list
 from gui.cat_and_sub.cat_and_sub_rename_ui import create_rename_ui
 from gui.cat_and_sub.cat_and_sub_delete_ui import create_delete_ui
 from gui.cat_and_sub.cat_and_sub_add_ui import create_add_ui
-from category import load_categories
+from gui.reports_gui.report_filter_ui import create_report_filter_window
 from .utils_gui import show_frame
 
 def run_gui():
-
-    categories_data = load_categories()
 
     # --- Включаем DPI-aware режим (важно для чётких шрифтов на Windows) ---
     try:
@@ -42,6 +40,10 @@ def run_gui():
     def back_to_cat_and_sub_change():
         root.title("Управление финансами | Категории и подкатегории")
         show_frame(cat_and_sub_change_menu, frame_data)
+
+    def confirm_exit():
+        if messagebox.askyesno("Подтвержение", "Вы действительно хотите выйти?"):
+            root.quit()
 
     # --- Функция переключения экранов ---
     def go_to_edit_transaction():
@@ -77,10 +79,13 @@ def run_gui():
     cat_and_sub_delete_frame = tk.Frame(root)
     cat_and_sub_add_frame = tk.Frame(root)
 
+    # --- Отчёты ---
+    reports_filter_frame = tk.Frame(root)
+
     frame_data = [main_menu, transactions_menu, add_transaction_frame,delete_transaction_frame, 
                   find_transaction_to_edit_frame, edit_transaction_frame, list_of_transactions_frame, cat_and_sub_menu,
                   cat_and_sub_list_frame, move_transactions_frame, cat_and_sub_change_menu, cat_and_sub_rename_frame,
-                  cat_and_sub_delete_frame, cat_and_sub_add_frame]
+                  cat_and_sub_delete_frame, cat_and_sub_add_frame, reports_filter_frame]
 
     # --- Главное меню ---
     main_button_container = tk.Frame(main_menu)
@@ -88,9 +93,11 @@ def run_gui():
 
     ttk.Button(main_button_container, text="Управление транзакциями", width=40, command=lambda: [root.title("Управление финансами | Транзакции"), show_frame(transactions_menu, frame_data)]).pack(pady=5)
     ttk.Button(main_button_container, text="Управление категориями", width=40, command=lambda: [root.title("Управление финансами | Категории и подкатегории"), show_frame(cat_and_sub_menu, frame_data)]).pack(pady=5)
-    ttk.Button(main_button_container, text="Статистика", width=40, command=lambda: messagebox.showinfo('Статистика', 'Окно со статистикой')).pack(pady=5)
+    ttk.Button(main_button_container, text="Генерация отчёта", width=40, 
+               command=lambda: [root.title("Управление финансами | Генерация отчёта"), 
+                                create_report_filter_window(reports_filter_frame, frame_data, back_to_main)]).pack(pady=5)
     ttk.Button(main_button_container, text="Отчёты", width=40, command=lambda: messagebox.showinfo('Отчёты', 'Окно с отчетами')).pack(pady=5)
-    ttk.Button(main_button_container, text="Выход", width=40, command=root.quit).pack(pady=5)
+    ttk.Button(main_button_container, text="Выход", width=40, command=confirm_exit).pack(pady=5)
 
 
     # --- Меню управления транзакциями ---
@@ -99,7 +106,7 @@ def run_gui():
 
     ttk.Button(transactions_button_container, text="Добавить транзакцию", width=40, 
                command=lambda: [root.title("Управление финансами | Транзакции | Добавление транзакции"), 
-                                create_add_transaction_ui(add_transaction_frame, categories_data, show_frame, frame_data, back_to_transactions)]).pack(pady=5)
+                                create_add_transaction_ui(add_transaction_frame, frame_data, back_to_transactions)]).pack(pady=5)
     ttk.Button(transactions_button_container, text="Удалить транзакцию", width=40, 
                command=lambda: [root.title("Управление финансами | Транзакции | Удаление транзакции"), 
                                 show_frame(delete_transaction_frame, frame_data)]).pack(pady=5)
@@ -141,7 +148,6 @@ def run_gui():
     ttk.Button(cat_and_sub_change_button_container, text="Назад", command=back_to_cat_and_sub, width=40).pack(pady=5)
 
     # === Транзакции ===
-
     # --- Форма удаления транзакции ---
     create_delete_transaction_ui(delete_transaction_frame, back_to_transactions)
 

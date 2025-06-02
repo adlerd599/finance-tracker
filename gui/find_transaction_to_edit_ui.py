@@ -15,7 +15,7 @@ def create_find_transaction_to_edit_ui(frame_search, frame_edit, data, back_call
         item = find_transaction_by_id(transaction_id)
 
         if item:
-            messagebox.showinfo("Найдено", f"Найдена транзакция с ID: {transaction_id} !")
+            messagebox.showinfo("Найдено", f"Найдена транзакция с ID: {transaction_id}!")
             id_var.set("")
             show_frame(frame_edit, data)
             open_edit_form(frame_edit, item, back_callback)

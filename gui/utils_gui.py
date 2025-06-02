@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from transaction import load_data
+from app.transaction import load_data
 
 # Поиск транзакции по ID
 def find_transaction_by_id(transaction_id):

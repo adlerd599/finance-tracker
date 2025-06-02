@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
-from analysis import filter_transactions_by_period
-from utils import validate_date
-from transaction import load_data  
+from app.analysis import filter_transactions_by_period
+from app.utils import validate_date
+from app.transaction import load_data  
 from .transactions_list_view_ui import show_filtered_transactions
 from .utils_gui import validate_date_input, auto_format_date_input, remove_combobox_selection
 
@@ -87,7 +87,7 @@ def create_transaction_filter_window(frame, back_callback):
     # Настраиваем форму, чтобы колонка расширялась
     form.columnconfigure(0, weight=1)
 
-    # --- Категория ---
+    # --- Рамка ---
     filter_frame = tk.LabelFrame(form, text="Фильтрация транзакций", padx=10, pady=10, width=700, height=350)
     filter_frame.grid(row=0, column=0, sticky='ew', padx=10, pady=5)
     filter_frame.grid_propagate(False)
@@ -97,12 +97,10 @@ def create_transaction_filter_window(frame, back_callback):
     filter_inner = tk.Frame(filter_frame)
     filter_inner.place(relx=0.5, rely=0.5, anchor='center')  # <-- Центрирование по вертикали и горизонтали
 
-
     # Вложенный фрейм для полей даты
     date_frame = tk.Frame(filter_inner)
     date_frame.grid(row=1, column=0, sticky="w", padx=50, pady=5)
     vcmd = (date_frame.register(validate_date_input), "%P")
-
 
     # --- Радио-кнопка "По дате" ---
     tk.Radiobutton(filter_inner, text="Фильтр по дате:", variable=filter_mode, value="date",

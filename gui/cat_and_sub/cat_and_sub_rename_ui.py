@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from gui.utils_gui import show_frame
-from category import load_categories, rename_category, rename_subcategory
+from app.category import load_categories, rename_category, rename_subcategory
 
 type_display = {
     'income': 'Доходы',
@@ -48,7 +48,7 @@ def create_rename_ui(frame, data, back_callback):
             if result["success"]:
                 messagebox.showinfo("Успех", result["message"])
                 categories_wrapper["data"] = load_categories()
-                 # Очистка полей
+                # Очистка полей
                 type_cat_var.set('')
                 old_cat_var.set('')
                 new_cat_var.set('')
@@ -58,6 +58,14 @@ def create_rename_ui(frame, data, back_callback):
                 update_category_list(type_cat_var, only_with_subcategories=False)
             else:
                 messagebox.showerror("Ошибка", result["message"])
+                # Очистка полей
+                type_cat_var.set('')
+                old_cat_var.set('')
+                new_cat_var.set('')
+
+                set_state(cat_column_1, "disabled")
+                type_cb_1.config(state='readonly')
+                update_category_list(type_cat_var, only_with_subcategories=False)
 
         else:  # mode == subcategory
             type_display_name = type_sub_var.get().strip()
@@ -89,6 +97,15 @@ def create_rename_ui(frame, data, back_callback):
                 update_category_list(type_sub_var, only_with_subcategories=True)
             else:
                 messagebox.showerror("Ошибка", result["message"])
+                # Очистка полей
+                type_sub_var.set('')
+                parent_cat_var.set('')
+                old_sub_var.set('')
+                new_sub_var.set('')
+
+                set_state(sub_column_1, "disabled")
+                type_cb_2.config(state='readonly')
+                update_category_list(type_sub_var, only_with_subcategories=True)
 
     def update_category_list(type_, only_with_subcategories=False):
         type_key = type_reverse.get(type_.get())
@@ -160,6 +177,7 @@ def create_rename_ui(frame, data, back_callback):
     def on_type_selected(type_, cats_cb, bool_, event):
         if not update_category_list(type_, bool_):
             messagebox.showinfo("Нет категорий", "Нет категорий с подкатегориями для выбранного типа.")
+            type_sub_var.set('')
             cats_cb.config(state="disabled")
             old_sub_cb.config(state="disabled")
         else:

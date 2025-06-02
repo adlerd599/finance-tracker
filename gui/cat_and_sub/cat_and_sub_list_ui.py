@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from category import load_categories
+from app.category import load_categories
 from gui.utils_gui import show_frame
 
 def create_cat_and_sub_list(frame, data, back_callback):

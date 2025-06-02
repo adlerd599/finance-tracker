@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from gui.utils_gui import show_frame
-from category import load_categories, add_category, add_subcategory
+from app.category import load_categories, add_category, add_subcategory
 
 type_display = {
     'income': 'Доходы',
@@ -51,6 +51,10 @@ def create_add_ui(frame, data, back_callback):
                 update_category_list(type_cat_var)
             else:
                 messagebox.showerror("Ошибка", result["message"])
+                 # Очистка полей
+                type_cat_var.set('')
+                new_cat_var.set('')
+                update_category_list(type_cat_var)
 
         else:  # mode == subcategory
             type_display_name = type_sub_var.get().strip()
@@ -69,6 +73,12 @@ def create_add_ui(frame, data, back_callback):
             # === Вот здесь проверка на доходы ===
             if type_key == 'income':
                 messagebox.showinfo("Недоступно", "Добавление подкатегорий к категориям доходов пока не поддерживается.")
+                 # Очистка полей
+                type_sub_var.set('')
+                parent_cat_var.set('')
+                new_sub_var.set('')
+                parent_cat_cb.config(state='disabled')
+                update_category_list(type_sub_var)
                 return
 
             result = add_subcategory(type_key, parent_cat, new_sub)
@@ -84,6 +94,12 @@ def create_add_ui(frame, data, back_callback):
 
             else:
                 messagebox.showerror("Ошибка", result["message"])
+                # Очистка полей
+                type_sub_var.set('')
+                parent_cat_var.set('')
+                new_sub_var.set('')
+                parent_cat_cb.config(state='disabled')
+                update_category_list(type_sub_var)
 
     def update_category_list(type_):
         type_key = type_reverse.get(type_.get())
@@ -129,7 +145,6 @@ def create_add_ui(frame, data, back_callback):
             except:
                 pass
 
-    
     def on_type_selected(type_, cats_cb, event):
         cats_cb.config(state="readonly")
         update_category_list(type_)

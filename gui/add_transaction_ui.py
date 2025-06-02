@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from transaction import add_transaction
-from category import load_categories
-from utils import validate_date
+from app.transaction import add_transaction
+from app.category import load_categories
+from app.utils import validate_date
 from gui.utils_gui import show_frame
 from .utils_gui import validate_amount_input, validate_date_input, auto_format_date_input, remove_combobox_selection
 
@@ -14,7 +14,9 @@ type_display = {
 # Обратное соответствие:
 type_reverse = {v: k for k, v in type_display.items()}
 
-def create_add_transaction_ui(frame, categories_data, show_frame_callback, data, back_callback):
+def create_add_transaction_ui(frame, data, back_callback):
+    categories = load_categories()
+
     for widget in frame.winfo_children():
             widget.destroy()
 
@@ -49,6 +51,7 @@ def create_add_transaction_ui(frame, categories_data, show_frame_callback, data,
         back_callback()
 
     def update_categories(*args):
+        categories_data = load_categories()
         type_displayed = type_var.get()
         type_ = type_reverse.get(type_displayed, '')  # 'income' или 'expenses'
         categories = list(categories_data.get(type_, {}).keys())
@@ -62,7 +65,7 @@ def create_add_transaction_ui(frame, categories_data, show_frame_callback, data,
         type_displayed = type_var.get()
         type_ = type_reverse.get(type_displayed, '')
         category = category_var.get()
-        subcategories = categories_data.get(type_, {}).get(category, [])
+        subcategories = categories.get(type_, {}).get(category, [])
 
         subcategory_cb['values'] = subcategories
         subcategory_var.set('')
@@ -87,6 +90,7 @@ def create_add_transaction_ui(frame, categories_data, show_frame_callback, data,
             subcategory_label.grid_forget()
             subcategory_cb.grid_forget()
             optional_cb.grid_forget()
+            optional_var.set(False)
 
     def save_transaction():
         type_displayed = type_var.get()
