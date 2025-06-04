@@ -6,6 +6,19 @@ def show_filtered_transactions(transactions, sort_by):
     frame.title("Список транзакций")
     frame.geometry("1000x700")
 
+    # --- Центрирование окна ---
+    frame.update_idletasks()  # Нужно, чтобы размеры окна точно обновились
+    screen_width = frame.winfo_screenwidth()
+    screen_height = frame.winfo_screenheight()
+
+    width = 1000
+    height = 700
+
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+
+    frame.geometry(f"{width}x{height}+{x}+{y}")
+
     for widget in frame.winfo_children():
         widget.destroy()
 
@@ -37,8 +50,8 @@ def show_filtered_transactions(transactions, sort_by):
     tree.column("type", width=100, anchor="center")
     tree.column("category", width=100, anchor="center")
     tree.column("subcategory", width=100, anchor="center")
-    tree.column("description", width=100, anchor="center")
-    tree.column("optional", width=100, anchor="center")
+    tree.column("description", width=160, anchor="center")
+    tree.column("optional", width=40, anchor="center")
     tree.column("date", width=100, anchor="center")
 
     # Прокрутка

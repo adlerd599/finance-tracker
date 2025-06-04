@@ -37,14 +37,13 @@ def create_report_filter_window(frame, data, back_callback):
 
         if result['success']:
             filtered = result['transactions']
+            expenses_grouped = {}
+            others_total = 0
+            others_detail = {}
+            total_exp = total_expenses(filtered)
 
             raw_expenses = sum_expenses_by_categories(filtered)
             if raw_expenses:
-                total_exp = total_expenses(filtered)
-
-                expenses_grouped = {}
-                others_total = 0
-                others_detail = {}
 
                 for category, amount in raw_expenses.items():
                     percent = amount / total_exp
@@ -55,7 +54,7 @@ def create_report_filter_window(frame, data, back_callback):
                         others_detail[category] = amount
 
                 if others_total > 0:
-                    expenses_grouped["Прочее"] = others_total  
+                    expenses_grouped["Прочее"] = round(others_total, 2) 
             
 
              # Строим словарь с данными отчета
@@ -106,15 +105,15 @@ def create_report_filter_window(frame, data, back_callback):
 
     vcmd = (around_inner.register(validate_date_input), "%P")
 
-    tk.Label(around_inner, text="Период отчётности:").grid(row=0, column=0, columnspan=4, sticky='w')
+    tk.Label(around_inner, text="Период отчётности: ").grid(row=0, column=0, sticky='w', padx=(0, 30))
 
-    tk.Label(around_inner, text="от:").grid(row=1, column=0, sticky='e', padx=(0, 5))
+    tk.Label(around_inner, text="от").grid(row=0, column=1, sticky='e', padx=(0, 7))
     date_from_entry = tk.Entry(around_inner, textvariable=date_from_var, validate="key", validatecommand=vcmd, width=15)
-    date_from_entry.grid(row=1, column=1, padx=(0, 10))
+    date_from_entry.grid(row=0, column=2, padx=(0, 10))
 
-    tk.Label(around_inner, text="до:").grid(row=1, column=2, sticky='e', padx=(0, 5))
+    tk.Label(around_inner, text="до").grid(row=0, column=3, sticky='e', padx=(15, 7))
     date_to_entry = tk.Entry(around_inner, textvariable=date_to_var, validate="key", validatecommand=vcmd, width=15)
-    date_to_entry.grid(row=1, column=3)
+    date_to_entry.grid(row=0, column=4)
 
     # Автоформат даты
     date_from_entry.bind("<KeyRelease>", lambda e: auto_format_date_input(e, date_from_entry, date_from_var))
